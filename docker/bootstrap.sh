@@ -39,7 +39,7 @@ rosdep install \
     --from-paths "${package_paths[@]}" \
     --ignore-src \
     --rosdistro humble \
-    --yes
+    -y
 
 colcon build \
     --symlink-install \
