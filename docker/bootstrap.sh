@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 if [[ ! -f /opt/ros/humble/setup.bash ]]; then
     echo "ROS 2 Humble was not found in /opt/ros/humble" >&2
@@ -12,6 +12,7 @@ if [[ "$(uname -m)" != "aarch64" ]]; then
 fi
 
 source /opt/ros/humble/setup.bash
+set -u
 cd /workspace
 
 package_paths=(
