@@ -18,6 +18,13 @@
 | `face_detect` | `app/face_tracker` | ROS 2 baseline exists; ArmPi validation pending |
 | `asr_control` | `xf_mic_asr_offline` | Optional vendor/AArch64 component; excluded from base build |
 
+## Raspberry Pi container deployment
+
+The official Hiwonder ROS 1 container is retained unchanged. A separate ARM64
+Ubuntu 22.04/ROS 2 Humble image, Compose configuration, and bootstrap script
+are provided for this migration. See [DOCKER.md](DOCKER.md) for device
+selection, ROS 1 shutdown, build, and commissioning instructions.
+
 ## Hardware differences that must remain explicit
 
 1. ArmPi bus IDs are `joint1=6`, `joint2=5`, `joint3=4`, `joint4=3`,

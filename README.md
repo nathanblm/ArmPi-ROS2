@@ -43,6 +43,16 @@ source install/setup.bash
 The optional `xf_mic_asr_offline` package contains vendor AArch64 libraries and
 will not link on x86_64. It is not required for the base arm.
 
+### Docker on the official Hiwonder image
+
+The repository includes a separate Ubuntu 22.04/ROS 2 Humble ARM64 container
+for the official Hiwonder Raspberry Pi image. It passes only the configured
+UART and camera devices, uses host networking for ROS 2 discovery, and remains
+idle until hardware bringup is started manually.
+
+See [docs/DOCKER.md](docs/DOCKER.md) for host checks, vendor-container
+shutdown, dependency installation, build, and launch instructions.
+
 ## Run
 
 Before enabling motion, place the arm in a clear workspace and be ready to

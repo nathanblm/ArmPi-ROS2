@@ -1,0 +1,40 @@
+services:
+  armpi_ros2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.humble
+    image: armpi-ros2:humble
+    container_name: armpi_ros2
+    platform: linux/arm64
+    network_mode: host
+    ipc: host
+    init: true
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+    environment:
+      ARMPI_CAMERA_DEVICE: "${ARMPI_CAMERA_DEVICE:-/dev/video0}"
+      ARMPI_SERIAL_DEVICE: "${ARMPI_SERIAL_DEVICE:-/dev/ttyAMA0}"
+      ROS_DOMAIN_ID: "${ROS_DOMAIN_ID:-0}"
+      ROS_LOCALHOST_ONLY: "0"
+
+    devices:
+      - "${ARMPI_SERIAL_DEVICE:-/dev/ttyAMA0}:${ARMPI_SERIAL_DEVICE:-/dev/ttyAMA0}"
+      - "${ARMPI_CAMERA_DEVICE:-/dev/video0}:${ARMPI_CAMERA_DEVICE:-/dev/video0}"
+
+    volumes:
+      - .:/workspace
+      - armpi_build:/workspace/build
+      - armpi_install:/workspace/install
+      - armpi_log:/workspace/log
+      - armpi_ros_logs:/root/.ros
+
+    command: ["sleep", "infinity"]
+
+volumes:
+  armpi_build:
+  armpi_install:
+  armpi_log:
+  armpi_ros_logs:
