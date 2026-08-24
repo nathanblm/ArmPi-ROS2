@@ -2,10 +2,19 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kinematics</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <version>0.1.0</version>
+  <description>ArmPi-FPV forward and inverse kinematics services.</description>
   <maintainer email="1270161395@qq.com">ubuntu</maintainer>
-  <license>TODO: License declaration</license>
+  <license>BSD-3-Clause</license>
+
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>kinematics_msgs</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>servo_controller_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

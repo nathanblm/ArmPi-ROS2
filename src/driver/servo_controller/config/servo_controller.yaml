@@ -1,37 +1,38 @@
 /**:
   ros__parameters:
     joint1:
-      id: 1
+      # ArmPi-FPV labels the base-to-wrist servos in reverse bus order.
+      id: 6
       init: 500
       min: 0
       max: 1000
 
     joint2:
-      id: 2
-      init: 500
-      min: 0
-      max: 1000
-
-    joint3:
-      id: 3
-      init: 500
-      min: 0
-      max: 1000
-
-    joint4:
-      id: 4
-      init: 500
-      min: 0
-      max: 1000
-
-    joint5:
       id: 5
       init: 500
       min: 0
       max: 1000
 
+    joint3:
+      id: 4
+      init: 500
+      min: 1000
+      max: 0
+
+    joint4:
+      id: 3
+      init: 500
+      min: 0
+      max: 1000
+
+    joint5:
+      id: 2
+      init: 500
+      min: 0
+      max: 1000
+
     r_joint:
-      id: 10
+      id: 1
       init: 700
       min: 0
       max: 1000

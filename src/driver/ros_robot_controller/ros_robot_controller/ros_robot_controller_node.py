@@ -6,7 +6,6 @@
 import math
 import time
 import rclpy
-import signal
 import threading
 from rclpy.node import Node
 from std_srvs.srv import Trigger
@@ -15,20 +14,39 @@ from std_msgs.msg import UInt16, Bool
 from rclpy.callback_groups import ReentrantCallbackGroup
 from ros_robot_controller.ros_robot_controller_sdk import Board
 from ros_robot_controller_msgs.srv import GetBusServoState, GetPWMServoState
-from ros_robot_controller_msgs.msg import ButtonState, BuzzerState, LedState, MotorsState, BusServoState, SetBusServoState, ServosPosition, SetPWMServoState, Sbus, OLEDState
+from ros_robot_controller_msgs.msg import (
+    BusServoState,
+    ButtonState,
+    BuzzerState,
+    LedState,
+    MotorsState,
+    OLEDState,
+    PWMServoState,
+    Sbus,
+    ServosPosition,
+    SetBusServoState,
+    SetPWMServoState,
+)
 
 class RosRobotController(Node):
     gravity = 9.80665
     def __init__(self, name):
-        rclpy.init()
         super().__init__(name)
-        self.board = Board()
-        self.board.enable_reception()
-        self.running = True
 
-        # 声明参数
+        self.declare_parameter('device', '/dev/ttyAMA0')
+        self.declare_parameter('baudrate', 1000000)
+        self.declare_parameter('timeout', 5.0)
         self.declare_parameter('imu_frame', 'imu_link')
         self.declare_parameter('init_finish', False)
+
+        device = self.get_parameter('device').value
+        baudrate = self.get_parameter('baudrate').value
+        timeout = self.get_parameter('timeout').value
+        self.board = Board(device=device, baudrate=baudrate, timeout=timeout)
+        self.board.enable_reception()
+        self.reception_enabled = True
+        self.running = True
+
         self.IMU_FRAME = self.get_parameter('imu_frame').value
 
         timer_cb_group = ReentrantCallbackGroup()
@@ -61,7 +79,7 @@ class RosRobotController(Node):
 
     def pub_callback(self):
         while self.running:
-            if self.enable_reception:
+            if self.reception_enabled:
                 self.pub_button_data(self.button_pub)
                 self.pub_joy_data(self.joy_pub)
                 self.pub_imu_data(self.imu_pub)
@@ -74,7 +92,7 @@ class RosRobotController(Node):
 
     def enable_reception(self, msg):
         self.get_logger().info('\033[1;32m%s\033[0m' % ('enable_reception ' + str(msg.data)))
-        self.enable_reception = msg.data
+        self.reception_enabled = msg.data
         self.board.enable_reception(msg.data)
 
     def set_led_state(self, msg):
@@ -103,20 +121,23 @@ class RosRobotController(Node):
         if data != []:
             self.board.pwm_servo_set_position(msg.duration, data)
 
-    def get_pwm_servo_state(self, msg):
+    def get_pwm_servo_state(self, request, response):
         states = []
-        for i in msg.cmd:
+        for command in request.cmd:
             data = PWMServoState()
-            if i.get_position:
-                state = self.board.pwm_servo_read_position(i.id)
+            data.id = [command.id]
+            if command.get_position:
+                state = self.board.pwm_servo_read_position(command.id)
                 if state is not None:
-                    data.position = state
-            if i.get_offset:
-                state = self.board.pwm_servo_read_offset(i.id)
+                    data.position = [state]
+            if command.get_offset:
+                state = self.board.pwm_servo_read_offset(command.id)
                 if state is not None:
-                    data.offset = state
+                    data.offset = [state]
             states.append(data)
-        return [True, states]
+        response.success = True
+        response.state = states
+        return response
 
     def set_bus_servo_position(self, msg):
         data = []
@@ -201,7 +222,7 @@ class RosRobotController(Node):
                 if state is not None:
                     data.max_temperature_limit = state
             if i.get_torque_state:
-                state = self.board.bus_servo_read_torque(i.id)
+                state = self.board.bus_servo_read_torque_state(i.id)
                 if state is not None:
                     data.enable_torque = state
             states.append(data)
@@ -268,7 +289,8 @@ class RosRobotController(Node):
             msg.linear_acceleration_covariance = [0.0004, 0.0, 0.0, 0.0, 0.0004, 0.0, 0.0, 0.0, 0.004]
             pub.publish(msg)
 
-def main():
+def main(args=None):
+    rclpy.init(args=args)
     node = RosRobotController('ros_robot_controller')
     # node.board.bus_servo_set_position(1.0, [[1,500], [2,600], [3,70], [4,140], [5,500], [10,200]])
     # servo_ids_to_check = [1, 2, 3, 4, 5, 10]
@@ -287,13 +309,13 @@ def main():
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        # node.board.set_motor_speed([[1, 0], [2, 0], [3, 0], [4, 0]])
-        node.destroy_node()
-        rclpy.shutdown()
-        print('shutdown')
+        pass
     finally:
-        print('shutdown finish')
+        node.running = False
+        node.board.enable_reception(False)
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
-

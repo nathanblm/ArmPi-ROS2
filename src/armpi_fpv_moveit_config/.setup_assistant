@@ -1,0 +1,6 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: armpi_fpv_description
+    relative_path: urdf/armpi_fpv.urdf
+  srdf:
+    relative_path: config/armpi_fpv.srdf

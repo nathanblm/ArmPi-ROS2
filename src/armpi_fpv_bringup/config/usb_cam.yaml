@@ -1,0 +1,14 @@
+/usb_cam:
+  ros__parameters:
+    video_device: /dev/video0
+    framerate: 30.0
+    io_method: mmap
+    frame_id: camera_link
+    pixel_format: yuyv
+    av_device_format: YUV422P
+    image_width: 640
+    image_height: 480
+    camera_name: armpi_fpv_camera
+    auto_white_balance: true
+    autoexposure: true
+    autofocus: false

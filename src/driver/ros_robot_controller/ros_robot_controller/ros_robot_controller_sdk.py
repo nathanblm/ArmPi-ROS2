@@ -355,7 +355,7 @@ class Board:
         self.buf_write(PacketFunction.PACKET_FUNC_PWM_SERVO, data)
 
     def pwm_servo_read_and_unpack(self, servo_id, cmd, unpack):
-        with self.servo_read_lock:
+        with self.pwm_servo_read_lock:
             self.buf_write(PacketFunction.PACKET_FUNC_PWM_SERVO, [cmd, servo_id])
             data = self.pwm_servo_queue.get(block=True)
             servo_id, cmd, info = struct.unpack(unpack, data)

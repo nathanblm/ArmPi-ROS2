@@ -10,6 +10,10 @@ build/
 bin/
 log/
 Log/
+*.egg-info/
+.pytest_cache/
+.colcon/
+compile_commands.json
 msg_gen/
 srv_gen/
 msg/*Action.msg

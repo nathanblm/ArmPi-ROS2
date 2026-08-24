@@ -19,15 +19,30 @@ from kinematics_msgs.msg import JointsRange, Link
 from kinematics_msgs.srv import SetRobotPose, SetJointValue, GetRobotPose, SetLink, GetLink, SetJointRange, GetJointRange
 
 fk = ForwardKinematics(debug=False)  # 不开启打印
+_armpi_links = (
+    transform.base_link,
+    transform.link1,
+    transform.link2,
+    transform.link3,
+    transform.tool_link,
+)
+set_link(*_armpi_links)
+fk.set_link(*_armpi_links)
+
+
 class SearchKinematicsSolutionsNode(Node):
     def __init__(self, name):
         # 初始化节点
-        rclpy.init()
         super().__init__(name)
         self.name = name
         self.last_time = 0
         self.current_time = 0
         self.current_servo_positions = []
+        self.declare_parameter('joint_servo_ids', [6, 5, 4, 3, 2])
+        self.joint_servo_ids = [
+            int(servo_id)
+            for servo_id in self.get_parameter('joint_servo_ids').value
+        ]
 
         self.create_subscription(ServoStateList, '/controller_manager/servo_states', self.get_servo_position, 1)
 
@@ -136,6 +151,11 @@ class SearchKinematicsSolutionsNode(Node):
 
     def get_current_pose_srv(self, request, response):
         # 获取机械臂当前位置
+        if len(self.current_servo_positions) != 5:
+            response.success = True
+            response.solution = False
+            response.pose = Pose()
+            return response
         angle = transform.pulse2angle(self.current_servo_positions)
         res = fk.get_fk(angle)
         pose = Pose() 
@@ -153,11 +173,11 @@ class SearchKinematicsSolutionsNode(Node):
 
     def get_servo_position(self, msg):
         # 获取舵机当前角度
-        servo_states = []
-        for i in msg.servo_state:
-            if 0 < i.id < 6:
-                servo_states.append(i.position)
-        self.current_servo_positions = np.array(servo_states)
+        states_by_id = {state.id: state.position for state in msg.servo_state}
+        if all(servo_id in states_by_id for servo_id in self.joint_servo_ids):
+            self.current_servo_positions = np.array([
+                states_by_id[servo_id] for servo_id in self.joint_servo_ids
+            ])
         # self.get_logger().info(str(self.current_servo_positions))
 
     def set_pose_target(self, position, pitch, pitch_range, resolution):
@@ -211,7 +231,8 @@ class SearchKinematicsSolutionsNode(Node):
         # self.get_logger().info('\033[1;32mset_pose_target: %s\033[0m' % str(response))
         return response
 
-def main():
+def main(args=None):
+    rclpy.init(args=args)
     node = SearchKinematicsSolutionsNode('kinematics')
     rclpy.spin(node)
     node.destroy_node()
