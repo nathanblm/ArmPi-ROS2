@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             'servo_controller = servo_controller.controller_manager:main',
             'grasp = servo_controller.grasp:main',
+            'keyboard_jog = servo_controller.keyboard_jog:main',
         ],
     },
 )

@@ -113,6 +113,27 @@ ros2 launch armpi_fpv_bringup hardware.launch.py \
   use_kinematics:=true
 ```
 
+## Keyboard joint commissioning
+
+With the hardware launch running in one terminal, open a second container
+shell and start the keyboard jogger:
+
+```bash
+source /opt/ros/humble/setup.bash
+source /workspace/install/setup.bash
+ros2 run servo_controller keyboard_jog
+```
+
+The jogger talks directly to the bus-servo driver, so do not run MoveIt or an
+ArmPi application at the same time. Press `h` to move slowly to the stock
+ArmPi-FPV home pose and unlock jogging. Select a servo with `1` through `6`,
+then use `a` and `d` to move it. Use `-` and `+` to change the step size.
+Press Space to stop motion, and `q` to stop and exit.
+
+Servo position feedback is unavailable on the stock ArmPi-FPV configuration.
+The displayed positions are commanded estimates, not measurements. Keep the
+workspace clear and a physical servo-power disconnect within reach.
+
 ## Container lifecycle
 
 Stop the ROS 2 container without deleting its persistent build volumes:
