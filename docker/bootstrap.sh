@@ -35,6 +35,7 @@ for package_path in "${package_paths[@]}"; do
 done
 
 rosdep update
+apt-get update
 rosdep install \
     --from-paths "${package_paths[@]}" \
     --ignore-src \
