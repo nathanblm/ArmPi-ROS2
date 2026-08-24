@@ -43,7 +43,7 @@ class ServoManager:
 
             servo_msg = ServoPosition()
             servo_msg.id = command.id
-            servo_msg.position = float(pulse)
+            servo_msg.position = pulse
             msg.position.append(servo_msg)
 
         if msg.position:
