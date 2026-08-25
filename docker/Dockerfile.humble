@@ -15,6 +15,7 @@ RUN apt-get update \
         python3-rosdep \
         python3-serial \
         python3-vcstool \
+        ros-humble-control-msgs \
         usbutils \
         v4l-utils \
     && rm -rf /var/lib/apt/lists/*
