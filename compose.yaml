@@ -12,7 +12,7 @@ services:
     working_dir: /workspace
     stdin_open: true
     tty: true
-    restart: "no"
+    restart: "unless-stopped"
 
     environment:
       ARMPI_CAMERA_DEVICE: "${ARMPI_CAMERA_DEVICE:-/dev/video0}"

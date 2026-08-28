@@ -78,8 +78,8 @@ def generate_launch_description():
         output='screen',
         parameters=[camera_config, {'video_device': camera_device}],
         remappings=[
-            ('image_raw', '/depth_cam/rgb/image_raw'),
-            ('camera_info', '/depth_cam/depth/camera_info'),
+            ('image_raw', '/usb_cam/rgb/image_raw'),
+            ('camera_info', '/usb_cam/rgb/camera_info'),
         ],
         condition=IfCondition(use_camera),
     )
